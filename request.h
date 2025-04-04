@@ -2,6 +2,7 @@
 
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QNetworkRequest>
 
 class Request : public QObject{
 
@@ -18,7 +19,7 @@ signals:
 
 public slots:
 
-    void onProcessRequest(QUrl url);
+    void onProcessRequest(QNetworkRequest request, QByteArray body);
     void httpReadyRead();
 
 private:

@@ -6,19 +6,10 @@
 
 Request::Request(): base_url("http://localhost:8080/") {}
 
-void Request::onProcessRequest(QUrl url) {
-    QUrl request_url(url.toString());
-    std::cout << request_url.toString().toStdString() << "\n";
+void Request::onProcessRequest(QNetworkRequest request, QByteArray body) {
+    
     reply.reset();
     network_manager.reset(new QNetworkAccessManager());
-
-    QNetworkRequest request(request_url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    QJsonObject user_object;
-    user_object["name"] = "Georgiy";
-    user_object["password"] = "123";
-    QJsonDocument doc(user_object);
-    QByteArray body(doc.toJson());
     reply.reset(network_manager->post(request, body));
 
 

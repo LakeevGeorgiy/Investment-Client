@@ -5,8 +5,13 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QThread>
+#include <QNetworkRequest>
+#include <QLabel>
+#include <memory>
 
-#include "request.h"
+#include "../context.h"
+#include "../request.h"
+#include "../main_window.h"
 
 class LoginWindow : public QDialog {
 
@@ -14,12 +19,13 @@ class LoginWindow : public QDialog {
 
 public:
 
-    LoginWindow(QWidget* parent = nullptr);
+    LoginWindow(std::shared_ptr<Context> context, QWidget* parent = nullptr);
     ~LoginWindow();
 
 signals:
 
-    void sendRequest(QUrl url);
+    void sendRequest(QNetworkRequest request, QByteArray body);
+    void UserLogin();
 
 private slots:
 
@@ -31,8 +37,10 @@ private:
 
     QLineEdit* username_input;
     QLineEdit* password_input;
+    QLabel* authorization_problem;
     QPushButton* login_button;
     QThread* network_thread;
 
+    std::shared_ptr<Context> context_;
     QScopedPointer<Request, QScopedPointerDeleter<Request>> request;
 };
