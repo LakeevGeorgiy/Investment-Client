@@ -9,9 +9,9 @@
 #include <QLabel>
 #include <memory>
 
-#include "../context.h"
-#include "../request.h"
-#include "../main_window.h"
+#include "../Context.h"
+#include "../Requests/Request.h"
+#include "../MainWindow.h"
 
 class LoginWindow : public QDialog {
 
@@ -30,7 +30,7 @@ signals:
 private slots:
 
     void startRequest();
-    void onHttpRead(QByteArray data);
+    void onHttpRead(int status_code, QByteArray data);
     void onHttpFinished();
 
 private:

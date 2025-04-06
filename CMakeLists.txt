@@ -9,12 +9,10 @@ set(CMAKE_AUTORCC ON)
 
 set(SOURCES
     main.cpp
-    main_window.h
-    main_window.cpp
-    request.h 
-    request.cpp
-    context.h 
-    context.cpp
+    MainWindow.h
+    MainWindow.cpp
+    Context.h 
+    Context.cpp
 )
 
 # set(CMAKE_AUTOUIC ON)
@@ -26,6 +24,7 @@ qt_add_executable(${PROJECT_NAME} "${SOURCES}")
 
 add_subdirectory(Models)
 add_subdirectory(Dialoges)
+add_subdirectory(Requests)
 
 include_directories(${Qt6_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} 
@@ -37,4 +36,5 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC 
         Models
         Dialoges
+        Requests
 )

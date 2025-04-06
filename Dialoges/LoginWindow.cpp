@@ -4,8 +4,9 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <iostream>
+#include <QGridLayout>
 
-#include "login_window.h"
+#include "LoginWindow.h"
 
 LoginWindow::LoginWindow( std::shared_ptr<Context> context, QWidget *parent): 
     QDialog(parent) 
@@ -18,54 +19,46 @@ LoginWindow::LoginWindow( std::shared_ptr<Context> context, QWidget *parent):
     , request(new Request())
 {
 
-    setWindowTitle(tr("Investments"));
-    resize(400,400);
+    setWindowTitle(tr("Log In"));
+    resize(400,200);
     
     auto top_layout = new QVBoxLayout(this);
-    auto username_layout = new QHBoxLayout();
-    auto password_layout = new QHBoxLayout();
-    auto problem_layout = new QHBoxLayout();
+    auto grid_layout = new QGridLayout();
     auto button_layout = new QHBoxLayout();
+
+    top_layout->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
 
     auto username_label = new QLabel("Login: ");
     username_label->setObjectName("username_label");
-    username_layout->addWidget(username_label);
+    grid_layout->addWidget(username_label, 0, 0);
 
     username_input->setObjectName("username_input");
-    username_layout->addWidget(username_input);
-
-    username_layout->setAlignment(Qt::AlignLeft);
-    top_layout->addLayout(username_layout);
+    grid_layout->addWidget(username_input, 0, 1);
 
     auto password_label = new QLabel("Password: ");
     password_label->setObjectName("password_label");
-    password_layout->addWidget(password_label);
+    grid_layout->addWidget(password_label, 1, 0);
 
     password_input->setObjectName("password_input");
     password_input->setEchoMode(QLineEdit::Password);
-    password_layout->addWidget(password_input);
+    grid_layout->addWidget(password_input, 1, 1);
 
-    password_layout->setAlignment(Qt::AlignLeft);
-    top_layout->addLayout(password_layout);
-
+    top_layout->addLayout(grid_layout);
     authorization_problem->setVisible(false);
-    problem_layout->addWidget(authorization_problem);
-    problem_layout->setAlignment(Qt::AlignHCenter);
-    top_layout->addLayout(problem_layout);
+    top_layout->addWidget(authorization_problem);
 
     button_layout->addWidget(login_button);
-    button_layout->setAlignment(Qt::AlignHCenter);
+    top_layout->addLayout(button_layout);
 
     request->moveToThread(network_thread);
 
     connect(login_button, &QPushButton::clicked, this, &LoginWindow::startRequest);
-    connect(this, &LoginWindow::sendRequest, request.get(), &Request::onProcessRequest);
+    connect(this, &LoginWindow::sendRequest, request.get(), &Request::PostRequest);
     connect(request.get(), &Request::gotHttpData, this, &LoginWindow::onHttpRead);
     connect(request.get(), &Request::httpFinished, this, &LoginWindow::onHttpFinished);
     connect(this, &LoginWindow::UserLogin, static_cast<MainWindow*>(parent), &MainWindow::WriteName);
 
     network_thread->start();
-    top_layout->addLayout(button_layout);
 
 }
 
@@ -91,22 +84,25 @@ void LoginWindow::startRequest() {
     emit sendRequest(request, body);
 }
 
-void LoginWindow::onHttpRead(QByteArray data) {
-    QJsonDocument doc = QJsonDocument::fromJson(data);
-    QJsonObject user_object = doc.object();
-    User cur_user(
-        user_object["id"].toInt()
-        , user_object["name"].toString()
-        , user_object["password"].toString()
-    );
-    context_->user_ = cur_user;
-    emit UserLogin();
-    this->close();
+void LoginWindow::onHttpRead(int status_code, QByteArray data) {
+
+    if (status_code == 200) {
+        QJsonDocument doc = QJsonDocument::fromJson(data);
+        QJsonObject user_object = doc.object();
+        User cur_user(
+            user_object["id"].toInt()
+            , user_object["name"].toString()
+            , user_object["password"].toString()
+        );
+        context_->user_ = cur_user;
+        emit UserLogin();
+        this->close();
+    } else if (status_code == 400) {
+        authorization_problem->setVisible(true);
+        authorization_problem->setText("Error: invalid login or password");
+    }
 }
 
 void LoginWindow::onHttpFinished() {
-    
-    authorization_problem->setVisible(true);
-    authorization_problem->setText("Error: invalid login or password");
     login_button->setEnabled(true);
 }

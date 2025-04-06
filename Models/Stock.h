@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
+#include <QString>
 
 class Stock {
 public:
@@ -9,11 +9,11 @@ public:
     uint64_t id_;
     uint32_t cost_;
     uint32_t count_;
-    std::string company_name_;
+    QString company_name_;
 
 public:
 
-    Stock(uint64_t id, uint32_t cost, uint32_t count, std::string company_name);
+    Stock(uint64_t id, uint32_t cost, uint32_t count, QString company_name);
 
     Stock(const Stock& other);
 

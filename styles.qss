@@ -1,6 +1,7 @@
 QPushButton {
     background-color: red;
     max-width: 75px;
+    margin-top: 15px;
 }
 
 #username_label{
@@ -19,4 +20,8 @@ QPushButton {
 
 #password_input {
     margin-right: 50px;
+}
+
+#confirm_pass_label {
+    font-size: 15px;
 }

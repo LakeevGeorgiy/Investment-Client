@@ -1,10 +1,8 @@
-project(Dialoges)
+project(Requests)
 
 add_library(${PROJECT_NAME}
-    LoginWindow.h 
-    LoginWindow.cpp
-    RegisterWindow.h 
-    RegisterWindow.cpp
+    Request.h 
+    Request.cpp
 )
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Network)

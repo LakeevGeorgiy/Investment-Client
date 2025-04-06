@@ -14,17 +14,17 @@ public:
 
 signals:
 
-    void gotHttpData(QByteArray data);
+    void gotHttpData(int status_code, QByteArray data);
     void httpFinished();
 
 public slots:
 
-    void onProcessRequest(QNetworkRequest request, QByteArray body);
+    void GetRequest(QNetworkRequest request, QByteArray body);
+    void PostRequest(QNetworkRequest request, QByteArray body);
     void httpReadyRead();
 
 private:
 
-    QUrl base_url;
     QScopedPointer<QNetworkAccessManager, QScopedPointerDeleter<QNetworkAccessManager>> network_manager;
     QScopedPointer<QNetworkReply, QScopedPointerDeleter<QNetworkReply>> reply;
 

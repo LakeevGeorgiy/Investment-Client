@@ -1,6 +1,6 @@
 #include "Stock.h"
 
-Stock::Stock(uint64_t id, uint32_t cost, uint32_t count, std::string company_name):
+Stock::Stock(uint64_t id, uint32_t cost, uint32_t count, QString company_name):
         id_(id)
         , cost_(cost)
         , count_(count)

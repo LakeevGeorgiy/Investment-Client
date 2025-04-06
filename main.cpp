@@ -2,8 +2,7 @@
 #include <QFile>
 #include <QLatin1String>
 
-#include "main_window.h"
-#include "Dialoges/login_window.h"
+#include "MainWindow.h"
 
 int main(int argc, char **argv) {
     QApplication app (argc, argv);
