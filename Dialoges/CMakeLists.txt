@@ -5,6 +5,10 @@ add_library(${PROJECT_NAME}
     LoginWindow.cpp
     RegisterWindow.h 
     RegisterWindow.cpp
+    SellStocksWindow.h 
+    SellStocksWindow.cpp
+    BuyStocksWindow.h 
+    BuyStocksWindow.cpp
 )
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Network)

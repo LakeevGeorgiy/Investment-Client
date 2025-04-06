@@ -10,17 +10,21 @@
 #include <QMessageBox>
 
 #include "MainWindow.h"
+#include "Dialoges/BuyStocksWindow.h"
 #include "Dialoges/LoginWindow.h"
 #include "Dialoges/RegisterWindow.h"
+#include "Dialoges/SellStocksWindow.h"
 #include "Models/Stock.h"
 
 MainWindow::MainWindow(QWidget *root) : 
     context_(new Context())
     , username_(new QLabel())
     , top_layout_(new QVBoxLayout(this))
+    , user_stocks_button_(new QPushButton("List"))
     , stocks_layout_(new QTableWidget(0, 4))
     , user_stocks_request_(new Request())
     , sell_stocks_request(new Request())
+    , all_stocks_request_(new Request())
     , QWidget(root)
 {
 
@@ -43,21 +47,20 @@ MainWindow::MainWindow(QWidget *root) :
     connect(register_button, &QPushButton::clicked, this, &MainWindow::ClickRegistrationButton);
     menu_layout_left->addWidget(register_button);
 
-    auto user_stocks_button = new QPushButton("List");
-    connect(user_stocks_button, &QPushButton::clicked, this, &MainWindow::UserStocksRequest);
+    user_stocks_button_->setVisible(false);
+    connect(user_stocks_button_, &QPushButton::clicked, this, &MainWindow::UserStocksRequest);
 
     auto exchange_button = new QPushButton("Exchange");
-    // connect(exchange_button, &QPushButton::clicked, this, &MainWindow::ClickExchangeButton);
+    connect(exchange_button, &QPushButton::clicked, this, &MainWindow::AllStocksRequest);
 
     connect(this, &MainWindow::SendUserStockRequest, user_stocks_request_.get(), &Request::GetRequest);
-    connect(this, &MainWindow::SendSellStockRequest, sell_stocks_request.get(), &Request::PostRequest);
-
     connect(user_stocks_request_.get(), &Request::gotHttpData, this, &MainWindow::UserStocksRead);
-    connect(sell_stocks_request.get(), &Request::gotHttpData, this, &MainWindow::UserSellStocksRead);
-    // connect(user_stocks_request_.get(), &Request::httpFinished, this, &MainWindow::onHttpFinished);
-    // connect(sell_stocks_request.get(), &Request::httpFinished, this, &MainWindow::onHttpFinished);
 
-    menu_layout_left->addWidget(user_stocks_button);
+    connect(this, &MainWindow::SendAllStocksRequest, all_stocks_request_.get(), &Request::GetRequest);
+    connect(all_stocks_request_.get(), &Request::gotHttpData, this, &MainWindow::AllStocksRead);
+
+    menu_layout_left->addWidget(user_stocks_button_);
+    menu_layout_left->addWidget(exchange_button);
 
     username_->setAlignment(Qt::AlignRight);
     menu_layout_right->addWidget(username_);
@@ -72,7 +75,10 @@ MainWindow::MainWindow(QWidget *root) :
 }
 
 void MainWindow::WriteName(){
+    stocks_layout_->clear();
+    stocks_layout_->setRowCount(0);
     username_->setText(context_->user_.name_);
+    user_stocks_button_->setVisible(true);
 }
 
 void MainWindow::UserStocksRequest() {
@@ -93,6 +99,17 @@ void MainWindow::UserStocksRequest() {
     emit SendUserStockRequest(request, body);
 }
 
+void MainWindow::AllStocksRequest(){
+
+    const QString url_string("http://localhost:8080/api/list_all_stocks");
+    const QUrl url = QUrl::fromUserInput(url_string);
+
+    QNetworkRequest request(url);
+    QByteArray body;
+
+    emit SendAllStocksRequest(request, body);
+}
+
 void MainWindow::UserStocksRead(int status_code, QByteArray data) {
 
     if (status_code == 200) {
@@ -106,69 +123,67 @@ void MainWindow::UserStocksRead(int status_code, QByteArray data) {
             message.exec();
         }
 
-        stocks_layout_->clear();
-        stocks_layout_->setRowCount(stocks_json.size());
-
-        for (int i = 0; i < stocks_json.size(); ++i) {
-
-            auto stock_object = QJsonValue(stocks_json[i]);
-
-            auto stock = Stock(
-                stock_object["id"].toInt(),
-                stock_object["cost"].toInt(),
-                stock_object["count"].toInt(),
-                stock_object["company_name"].toString()
-            );
-
-            qDebug() << stock.company_name_;
-
-            auto cost = new QTableWidgetItem(QString::number(stock.cost_));
-            auto count = new QTableWidgetItem(QString::number(stock.count_));
-            auto cell_button = new QPushButton("Sell");
-            auto company = new QTableWidgetItem(stock.company_name_);
-            connect(cell_button, &QPushButton::clicked, [this, stock]() {
-                this->UserSellRequest(stock);
-                this->UserStocksRequest();
-            });
-        
-            // stocks_layout_->insertRow(i);
-        
-            stocks_layout_->setItem(i, 0, cost);
-            stocks_layout_->setItem(i, 1, count);
-            stocks_layout_->setItem(i, 2, company);
-            stocks_layout_->setCellWidget(i, 3, cell_button);
-        }
-        stocks_layout_->setVisible(true);
+        std::function button_click = [this](Stock stock) {
+            SellStocksWindow sell_window(stock, context_, this);
+            sell_window.setModal(false);
+            sell_window.exec();
+        };
+        PrintStocks(stocks_json, "Sell", button_click);
     } 
 }
 
-void MainWindow::UserSellStocksRead(int status_code, QByteArray data){
+void MainWindow::AllStocksRead(int status_code, QByteArray data){
+
     if (status_code == 200) {
-        qDebug() << "sell stocks\n";
-    } else {
-        qDebug() << "can't sell stocks\n";
+
+        QJsonDocument doc = QJsonDocument::fromJson(data);
+        QJsonArray stocks_json = doc.array();
+
+        if (stocks_json.empty()) {
+            QMessageBox message(this);
+            message.setInformativeText("No stocks are not available");
+            message.exec();
+        }
+
+        std::function button_click = [this](Stock stock) {
+            BuyStocksWindow buy_window(stock, context_, this);
+            buy_window.setModal(false);
+            buy_window.exec();
+        };
+        PrintStocks(stocks_json, "Buy", button_click);
     }
 }
 
-void MainWindow::UserSellRequest(const Stock &stock){
+void MainWindow::PrintStocks(QJsonArray &stocks_json, const QString& button_text, std::function<void(Stock)>& button_click){
 
-    const QString url_string("http://localhost:8080/api/sell_stocks");
-    const QUrl url = QUrl::fromUserInput(url_string);
+    stocks_layout_->clear();
+    stocks_layout_->setRowCount(stocks_json.size());
 
-    QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    for (int i = 0; i < stocks_json.size(); ++i) {
 
-    QJsonObject user_object;
-    user_object["user_id"] = QJsonValue((int)context_->user_.id_);
-    user_object["stock_id"] = QJsonValue((int)stock.id_);
-    user_object["count"] = QJsonValue((int)stock.count_);
+        auto stock_object = QJsonValue(stocks_json[i]);
 
-    QJsonDocument doc(user_object);
-    QByteArray body(doc.toJson());
+        auto stock = Stock(
+            stock_object["id"].toInt(),
+            stock_object["cost"].toInt(),
+            stock_object["count"].toInt(),
+            stock_object["company_name"].toString()
+        );
 
-    qDebug() << "sell stock: " << stock.id_;
+        auto cost = new QTableWidgetItem(QString::number(stock.cost_));
+        auto count = new QTableWidgetItem(QString::number(stock.count_));
+        auto cell_button = new QPushButton(button_text);
+        auto company = new QTableWidgetItem(stock.company_name_);
+        connect(cell_button, &QPushButton::clicked, std::bind(button_click, stock));
+    
+    
+        stocks_layout_->setItem(i, 0, cost);
+        stocks_layout_->setItem(i, 1, count);
+        stocks_layout_->setItem(i, 2, company);
+        stocks_layout_->setCellWidget(i, 3, cell_button);
+    }
+    stocks_layout_->setVisible(true);
 
-    emit SendSellStockRequest(request, body);
 }
 
 void MainWindow::ClickLogIntButton()

@@ -5,6 +5,7 @@
 #include <memory>
 #include <QGridLayout>
 #include <QTableWidget>
+#include <QPushButton>
 #include <QNetworkRequest>
 
 #include "Context.h"
@@ -18,6 +19,7 @@ private:
 
     QLabel* username_;
     QVBoxLayout* top_layout_;
+    QPushButton* user_stocks_button_;
     QTableWidget* stocks_layout_;
     std::shared_ptr<Context> context_;
     QScopedPointer<Request, QScopedPointerDeleter<Request>> user_stocks_request_;
@@ -27,15 +29,15 @@ private:
 signals:
 
     void SendUserStockRequest(QNetworkRequest request, QByteArray body);
-    void SendSellStockRequest(QNetworkRequest request, QByteArray body);
+    void SendAllStocksRequest(QNetworkRequest request, QByteArray body);
 
 public slots:
 
     void WriteName();
     void UserStocksRequest();
+    void AllStocksRequest();
     void UserStocksRead(int status_code, QByteArray data);
-    void UserSellStocksRead(int status_code, QByteArray data);
-
+    void AllStocksRead(int status_code, QByteArray data);
 
 public:
 
@@ -43,7 +45,8 @@ public:
 
 private:
 
-    void UserSellRequest(const Stock& stock);
+    void PrintStocks(
+        QJsonArray& stocks_json, const QString& button_text, std::function<void(Stock)>& button_click);
     void ClickLogIntButton();
     void ClickRegistrationButton();
 };
