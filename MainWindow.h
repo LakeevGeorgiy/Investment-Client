@@ -17,6 +17,7 @@ class MainWindow : public QWidget {
     Q_OBJECT
 private:
 
+    QLabel* balance_;
     QLabel* username_;
     QVBoxLayout* top_layout_;
     QPushButton* user_stocks_button_;
@@ -34,6 +35,7 @@ signals:
 public slots:
 
     void WriteName();
+    void WriteBalance();
     void UserStocksRequest();
     void AllStocksRequest();
     void UserStocksRead(int status_code, QByteArray data);

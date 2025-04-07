@@ -53,6 +53,7 @@ SellStocksWindow::SellStocksWindow(const Stock& stock, std::shared_ptr<Context> 
     connect(request_.get(), &Request::gotHttpData, this, &SellStocksWindow::onHttpRead);
     // connect(request_.get(), &Request::httpFinished, this, &SellStocksWindow::onHttpFinished);
     connect(this, &SellStocksWindow::SuccessSell, static_cast<MainWindow*>(parent), &MainWindow::UserStocksRequest);
+    connect(this, &SellStocksWindow::UpdateBalance, static_cast<MainWindow*>(parent), &MainWindow::WriteBalance);
 
     network_thread_->start();
 
@@ -91,7 +92,12 @@ void SellStocksWindow::onHttpRead(int status_code, QByteArray data){
         sell_problem_->setVisible(true);
         sell_problem_->setText(data);
     } else {
+        QJsonDocument doc = QJsonDocument::fromJson(data);
+        QJsonObject user_object = doc.object();
+        context_->user_.balance_ = user_object["balance"].toInt();
+        
         emit SuccessSell();
+        emit UpdateBalance();
         this->close();
     }
 

@@ -114,6 +114,7 @@ void RegisterWindow::onHttpRead(int status_code, QByteArray data) {
             user_object["id"].toInt()
             , user_object["name"].toString()
             , user_object["password"].toString()
+            , user_object["balance"].toInt()
         );
         context_->user_ = cur_user;
         context_->authorized_ = true;

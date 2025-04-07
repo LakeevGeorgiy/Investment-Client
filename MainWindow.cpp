@@ -18,6 +18,7 @@
 
 MainWindow::MainWindow(QWidget *root) : 
     context_(new Context())
+    , balance_(new QLabel())
     , username_(new QLabel())
     , top_layout_(new QVBoxLayout(this))
     , user_stocks_button_(new QPushButton("List"))
@@ -63,7 +64,9 @@ MainWindow::MainWindow(QWidget *root) :
     menu_layout_left->addWidget(exchange_button);
 
     username_->setAlignment(Qt::AlignRight);
+    balance_->setAlignment(Qt::AlignRight);
     menu_layout_right->addWidget(username_);
+    menu_layout_right->addWidget(balance_);
     
     grid_layout->addLayout(menu_layout_left, 0, 0);
     grid_layout->addLayout(menu_layout_right, 0, 2);
@@ -78,10 +81,16 @@ void MainWindow::WriteName(){
     stocks_layout_->clear();
     stocks_layout_->setRowCount(0);
     username_->setText(context_->user_.name_);
+    balance_->setText(QString::number(context_->user_.balance_));
     user_stocks_button_->setVisible(true);
 }
 
-void MainWindow::UserStocksRequest() {
+void MainWindow::WriteBalance(){
+    balance_->setText(QString::number(context_->user_.balance_));
+}
+
+void MainWindow::UserStocksRequest()
+{
 
     const QString url_string("http://localhost:8080/api/list_user_stock");
     const QUrl url = QUrl::fromUserInput(url_string);

@@ -23,6 +23,7 @@ signals:
 
     void SellRequest(QNetworkRequest request, QByteArray body);
     void SuccessSell();
+    void UpdateBalance();
 
 private slots:
 

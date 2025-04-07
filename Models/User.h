@@ -10,11 +10,12 @@ public:
     uint64_t id_;
     QString name_;
     QString password_;
+    uint64_t balance_;
     std::unordered_map<uint64_t, uint32_t> stocks_;
 
 public:
 
-    User(uint64_t id, QString name, QString password);
+    User(uint64_t id, QString name, QString password, uint64_t balance);
 
     User(const User& other);
 
