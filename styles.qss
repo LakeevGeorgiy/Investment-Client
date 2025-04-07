@@ -25,3 +25,23 @@ QPushButton {
 #confirm_pass_label {
     font-size: 15px;
 }
+
+#authorization_name {
+    font-size:15px;
+    color: red;
+}
+
+#buy_problem {
+    font-size:15px;
+    color: red;
+}
+
+#sell_problem {
+    font-size:15px;
+    color: red;
+}
+
+#authorization_problem {
+    font-size:15px;
+    color: red;
+}

@@ -53,12 +53,13 @@ RegisterWindow::RegisterWindow(std::shared_ptr<Context> context, QWidget *parent
     grid_layout->addWidget(repeat_pass_input_, 2, 1);
 
     authorization_problem_->setVisible(false);
+    authorization_problem_->setObjectName("authorization_problem");
 
     button_layout->addWidget(register_button_);
 
     request_->moveToThread(network_thread_);
 
-    connect(register_button_, &QPushButton::clicked, this, &RegisterWindow::StartRequest);
+    connect(register_button_, &QPushButton::clicked, this, &RegisterWindow::RegisterButtonClicked);
     connect(this, &RegisterWindow::RegisterRequest, request_.get(), &Request::PostRequest);
     connect(request_.get(), &Request::gotHttpData, this, &RegisterWindow::onHttpRead);
     connect(request_.get(), &Request::httpFinished, this, &RegisterWindow::onHttpFinished);
@@ -115,6 +116,8 @@ void RegisterWindow::onHttpRead(int status_code, QByteArray data) {
             , user_object["password"].toString()
         );
         context_->user_ = cur_user;
+        context_->authorized_ = true;
+
         emit UserLogin();
         this->close();
     } else if (status_code == 400) {
@@ -125,4 +128,28 @@ void RegisterWindow::onHttpRead(int status_code, QByteArray data) {
 
 void RegisterWindow::onHttpFinished() {
     register_button_->setEnabled(true);
+}
+
+void RegisterWindow::RegisterButtonClicked(){
+    if (username_input_->text().isEmpty()) {
+        authorization_problem_->setVisible(true);
+        authorization_problem_->setText("Please, write login");
+        return;
+    }
+    if (password_input_->text().isEmpty()) {
+        authorization_problem_->setVisible(true);
+        authorization_problem_->setText("Please, write password");
+        return;
+    }
+    if (repeat_pass_input_->text().isEmpty()) {
+        authorization_problem_->setVisible(true);
+        authorization_problem_->setText("Please, repeat password");
+        return;
+    }
+    if (repeat_pass_input_->text() != password_input_->text()) {
+        authorization_problem_->setVisible(true);
+        authorization_problem_->setText("Passwords must be the same");
+        return;
+    }
+    StartRequest();
 }

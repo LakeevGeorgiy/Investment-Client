@@ -119,6 +119,7 @@ void MainWindow::UserStocksRead(int status_code, QByteArray data) {
 
         if (stocks_json.empty()) {
             QMessageBox message(this);
+            message.setFixedSize(200, 50);
             message.setInformativeText("You don't have stocks");
             message.exec();
         }

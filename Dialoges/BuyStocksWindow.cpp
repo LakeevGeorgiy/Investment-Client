@@ -33,10 +33,13 @@ BuyStocksWindow::BuyStocksWindow(const Stock& stock, std::shared_ptr<Context> co
     grid_layout->addWidget(cnt_label, 0, 0);
 
     cnt_input_->setObjectName("buy_cnt_input");
+    auto validator = new QIntValidator(cnt_input_);
+    cnt_input_->setValidator(validator);
     grid_layout->addWidget(cnt_input_, 0, 1);
 
     top_layout->addLayout(grid_layout);
     buy_problem_->setVisible(false);
+    buy_problem_->setObjectName("buy_problem");
     top_layout->addWidget(buy_problem_);
 
     button_layout->addWidget(buy_button_);
@@ -44,10 +47,9 @@ BuyStocksWindow::BuyStocksWindow(const Stock& stock, std::shared_ptr<Context> co
 
     request_->moveToThread(network_thread_);
 
-    connect(buy_button_, &QPushButton::clicked, this, &BuyStocksWindow::StartRequest);
+    connect(buy_button_, &QPushButton::clicked, this, &BuyStocksWindow::BuyButtonClicked);
     connect(this, &BuyStocksWindow::BuyRequest, request_.get(), &Request::PostRequest);
     connect(request_.get(), &Request::gotHttpData, this, &BuyStocksWindow::onHttpRead);
-    // connect(request_.get(), &Request::httpFinished, this, &SellStocksWindow::onHttpFinished);
     connect(this, &BuyStocksWindow::SuccessBuy, static_cast<MainWindow*>(parent), &MainWindow::AllStocksRequest);
 
     network_thread_->start();
@@ -76,8 +78,6 @@ void BuyStocksWindow::StartRequest(){
     QJsonDocument doc(user_object);
     QByteArray body(doc.toJson());
 
-    qDebug() << "buy stock: " << stock_.id_;
-
     emit BuyRequest(request, body);
 }
 
@@ -91,4 +91,24 @@ void BuyStocksWindow::onHttpRead(int status_code, QByteArray data){
         this->close();
     }
 
+}
+
+void BuyStocksWindow::BuyButtonClicked(){
+
+    if (!context_->authorized_) {
+        buy_problem_->setText("To buy you need to log in");
+        buy_problem_->setVisible(true);
+        return;        
+    }
+    if (cnt_input_->text().isEmpty()) {
+        buy_problem_->setText("Write number of stocks");
+        buy_problem_->setVisible(true);
+        return;
+    }
+    if (cnt_input_->text().toInt() <= 0) {
+        buy_problem_->setText("Value must be greater than zero");
+        buy_problem_->setVisible(true);
+        return;
+    }
+    StartRequest();
 }

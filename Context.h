@@ -6,6 +6,7 @@ class Context {
 public:
 
     User user_;
+    bool authorized_;
 
 public:
     

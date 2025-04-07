@@ -1,4 +1,4 @@
 #include "Context.h"
 
-Context::Context(): user_(0, "", "") {
+Context::Context(): authorized_(false), user_(0, "", "") {
 }

@@ -40,4 +40,6 @@ private:
 
     std::shared_ptr<Context> context_;
     QScopedPointer<Request, QScopedPointerDeleter<Request>> request_;
+
+    void RegisterButtonClicked();
 };

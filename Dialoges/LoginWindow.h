@@ -24,23 +24,25 @@ public:
 
 signals:
 
-    void sendRequest(QNetworkRequest request, QByteArray body);
+    void LoginRequest(QNetworkRequest request, QByteArray body);
     void UserLogin();
 
 private slots:
 
-    void startRequest();
-    void onHttpRead(int status_code, QByteArray data);
+    void StartRequest();
+    void OnHttpRead(int status_code, QByteArray data);
     void onHttpFinished();
 
 private:
 
-    QLineEdit* username_input;
-    QLineEdit* password_input;
-    QLabel* authorization_problem;
-    QPushButton* login_button;
-    QThread* network_thread;
+    QLineEdit* username_input_;
+    QLineEdit* password_input_;
+    QLabel* authorization_problem_;
+    QPushButton* login_button_;
+    QThread* network_thread_;
 
     std::shared_ptr<Context> context_;
     QScopedPointer<Request, QScopedPointerDeleter<Request>> request;
+
+    void LoginButtonClicked();
 };

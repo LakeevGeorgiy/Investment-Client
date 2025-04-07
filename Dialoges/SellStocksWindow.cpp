@@ -33,10 +33,14 @@ SellStocksWindow::SellStocksWindow(const Stock& stock, std::shared_ptr<Context> 
     grid_layout->addWidget(cnt_label, 0, 0);
 
     cnt_input_->setObjectName("sell_cnt_input");
+    auto validator = new QIntValidator(cnt_input_);
+    cnt_input_->setValidator(validator);
     grid_layout->addWidget(cnt_input_, 0, 1);
 
     top_layout->addLayout(grid_layout);
     sell_problem_->setVisible(false);
+    sell_problem_->setObjectName("sell_problem");
+
     top_layout->addWidget(sell_problem_);
 
     button_layout->addWidget(sell_button_);
@@ -44,7 +48,7 @@ SellStocksWindow::SellStocksWindow(const Stock& stock, std::shared_ptr<Context> 
 
     request_->moveToThread(network_thread_);
 
-    connect(sell_button_, &QPushButton::clicked, this, &SellStocksWindow::StartRequest);
+    connect(sell_button_, &QPushButton::clicked, this, &SellStocksWindow::SellButtonClicked);
     connect(this, &SellStocksWindow::SellRequest, request_.get(), &Request::PostRequest);
     connect(request_.get(), &Request::gotHttpData, this, &SellStocksWindow::onHttpRead);
     // connect(request_.get(), &Request::httpFinished, this, &SellStocksWindow::onHttpFinished);
@@ -91,4 +95,23 @@ void SellStocksWindow::onHttpRead(int status_code, QByteArray data){
         this->close();
     }
 
+}
+
+void SellStocksWindow::SellButtonClicked(){
+    if (!context_->authorized_) {
+        sell_problem_->setText("To buy you need to log in");
+        sell_problem_->setVisible(true);
+        return;        
+    }
+    if (cnt_input_->text().isEmpty()) {
+        sell_problem_->setText("Write number of stocks");
+        sell_problem_->setVisible(true);
+        return;
+    }
+    if (cnt_input_->text().toInt() <= 0) {
+        sell_problem_->setText("Value must be greater than zero");
+        sell_problem_->setVisible(true);
+        return;
+    }
+    StartRequest();
 }
