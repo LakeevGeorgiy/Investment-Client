@@ -9,7 +9,7 @@
 #include "LoginWindow.h"
 
 LoginWindow::LoginWindow( std::shared_ptr<Context> context, QWidget *parent): 
-    QDialog(parent) 
+    QWidget(parent) 
     , username_input_(new QLineEdit(this))
     , password_input_(new QLineEdit(this))
     , authorization_problem_(new QLabel(""))
@@ -26,7 +26,7 @@ LoginWindow::LoginWindow( std::shared_ptr<Context> context, QWidget *parent):
     auto grid_layout = new QGridLayout();
     auto button_layout = new QHBoxLayout();
 
-    top_layout->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+    top_layout->setAlignment(Qt::AlignVCenter);
 
     auto username_label = new QLabel("Login: ");
     username_label->setObjectName("username_label");
@@ -44,10 +44,15 @@ LoginWindow::LoginWindow( std::shared_ptr<Context> context, QWidget *parent):
     grid_layout->addWidget(password_input_, 1, 1);
 
     top_layout->addLayout(grid_layout);
-    authorization_problem_->setVisible(false);
-    authorization_problem_->setObjectName("authorization_name");
-    top_layout->addWidget(authorization_problem_);
 
+    auto problem_layout = new QHBoxLayout();
+    authorization_problem_->setVisible(false);
+    authorization_problem_->setObjectName("authorization_problem");
+    problem_layout->addWidget(authorization_problem_);
+    problem_layout->setAlignment(Qt::AlignHCenter);
+    top_layout->addLayout(problem_layout);
+
+    login_button_->setObjectName("auth_user_button");
     button_layout->addWidget(login_button_);
     top_layout->addLayout(button_layout);
 
@@ -57,7 +62,7 @@ LoginWindow::LoginWindow( std::shared_ptr<Context> context, QWidget *parent):
     connect(this, &LoginWindow::LoginRequest, request.get(), &Request::PostRequest);
     connect(request.get(), &Request::gotHttpData, this, &LoginWindow::OnHttpRead);
     connect(request.get(), &Request::httpFinished, this, &LoginWindow::onHttpFinished);
-    connect(this, &LoginWindow::UserLogin, static_cast<MainWindow*>(parent), &MainWindow::WriteName);
+    connect(this, &LoginWindow::UserLogin, static_cast<MainWindow*>(parent), &MainWindow::UpdateMainWindow);
 
     network_thread_->start();
 

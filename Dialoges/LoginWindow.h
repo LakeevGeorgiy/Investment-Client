@@ -13,7 +13,7 @@
 #include "../Requests/Request.h"
 #include "../MainWindow.h"
 
-class LoginWindow : public QDialog {
+class LoginWindow : public QWidget {
 
     Q_OBJECT
 

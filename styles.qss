@@ -1,32 +1,48 @@
 QPushButton {
+    font-size: 17px;
     background-color: red;
-    max-width: 75px;
+    padding: 7px 15px;
+    border: 1px solid;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+QPushButton::pressed {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 #ff0000, stop: 1 #ad0000);
+}
+
+#sell_button {
+    font-size: 0px;
+    background-color: none;
+    border-radius: 0px;
+    border: none;
+}
+
+QTableWidget {
+    font-size: 17px;
+}
+
+QHeaderView {
+    font-size: 17px;
+}
+
+#auth_user_button {
     margin-top: 15px;
+    max-width: 100px;
 }
 
-#username_label{
-    font-size: 15px;
-    margin-right: 50px;
+QLabel {
+    font-size: 17px;
+    padding: 5px 15px;
 }
 
-#password_label {
-    font-size: 15px;
-    margin-right: 22px;
+QLineEdit {
+    font-size: 17px;
 }
 
-#username_input {
-    margin-right: 50px;
-}
 
-#password_input {
-    margin-right: 50px;
-}
-
-#confirm_pass_label {
-    font-size: 15px;
-}
-
-#authorization_name {
+#authorization_problem {
     font-size:15px;
     color: red;
 }
@@ -45,3 +61,4 @@ QPushButton {
     font-size:15px;
     color: red;
 }
+

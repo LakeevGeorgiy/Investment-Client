@@ -25,6 +25,7 @@ qt_add_executable(${PROJECT_NAME} "${SOURCES}")
 add_subdirectory(Models)
 add_subdirectory(Dialoges)
 add_subdirectory(Requests)
+add_subdirectory(Pages)
 
 include_directories(${Qt6_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} 
@@ -37,4 +38,5 @@ target_link_libraries(${PROJECT_NAME}
         Models
         Dialoges
         Requests
+        Pages
 )

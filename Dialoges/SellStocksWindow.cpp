@@ -6,7 +6,7 @@
 #include <QHBoxLayout>
 
 #include "SellStocksWindow.h"
-#include "../MainWindow.h"
+#include "../Pages/UserStocksPage.h"
 
 SellStocksWindow::SellStocksWindow(const Stock& stock, std::shared_ptr<Context> context, QWidget *parent) :
     cnt_input_(new QLineEdit())
@@ -52,8 +52,8 @@ SellStocksWindow::SellStocksWindow(const Stock& stock, std::shared_ptr<Context> 
     connect(this, &SellStocksWindow::SellRequest, request_.get(), &Request::PostRequest);
     connect(request_.get(), &Request::gotHttpData, this, &SellStocksWindow::onHttpRead);
     // connect(request_.get(), &Request::httpFinished, this, &SellStocksWindow::onHttpFinished);
-    connect(this, &SellStocksWindow::SuccessSell, static_cast<MainWindow*>(parent), &MainWindow::UserStocksRequest);
-    connect(this, &SellStocksWindow::UpdateBalance, static_cast<MainWindow*>(parent), &MainWindow::WriteBalance);
+    connect(this, &SellStocksWindow::SuccessSell, static_cast<UserStocksPage*>(parent), &UserStocksPage::OpenPage);
+    connect(this, &SellStocksWindow::UpdateBalance, static_cast<UserStocksPage*>(parent), &UserStocksPage::WriteBalance);
 
     network_thread_->start();
 
@@ -81,7 +81,7 @@ void SellStocksWindow::StartRequest(){
     QJsonDocument doc(user_object);
     QByteArray body(doc.toJson());
 
-    qDebug() << "sell stock: " << stock_.id_;
+    // qDebug() << "sell stock: " << stock_.id_;
 
     emit SellRequest(request, body);
 }

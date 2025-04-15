@@ -6,40 +6,36 @@
 #include <QGridLayout>
 #include <QTableWidget>
 #include <QPushButton>
+#include <QStackedWidget>
 #include <QNetworkRequest>
 
 #include "Context.h"
 #include "Requests/Request.h"
 #include "Models/Stock.h"
+#include "Pages/UserStocksPage.h"
+#include "Pages/ExchangeGlassPage.h"
 
 class MainWindow : public QWidget {
 
     Q_OBJECT
 private:
 
-    QLabel* balance_;
-    QLabel* username_;
     QVBoxLayout* top_layout_;
+    QStackedWidget* stacked_widget_;
     QPushButton* user_stocks_button_;
     QTableWidget* stocks_layout_;
     std::shared_ptr<Context> context_;
-    QScopedPointer<Request, QScopedPointerDeleter<Request>> user_stocks_request_;
-    QScopedPointer<Request, QScopedPointerDeleter<Request>> sell_stocks_request;
-    QScopedPointer<Request, QScopedPointerDeleter<Request>> all_stocks_request_;
+    std::shared_ptr<UserStocksPage> user_stocks_page_;
+    std::shared_ptr<ExchangeGlassPage> exchange_glass_page_;
 
 signals:
 
-    void SendUserStockRequest(QNetworkRequest request, QByteArray body);
-    void SendAllStocksRequest(QNetworkRequest request, QByteArray body);
+    void OpenUserStockPage();
+    void OpenExchangeGlassPage();
 
 public slots:
 
-    void WriteName();
-    void WriteBalance();
-    void UserStocksRequest();
-    void AllStocksRequest();
-    void UserStocksRead(int status_code, QByteArray data);
-    void AllStocksRead(int status_code, QByteArray data);
+    void UpdateMainWindow();
 
 public:
 
@@ -47,8 +43,9 @@ public:
 
 private:
 
-    void PrintStocks(
-        QJsonArray& stocks_json, const QString& button_text, std::function<void(Stock)>& button_click);
     void ClickLogIntButton();
     void ClickRegistrationButton();
+    void ClickUserStocksButton();
+    void ClickAllStocksButton();
+
 };

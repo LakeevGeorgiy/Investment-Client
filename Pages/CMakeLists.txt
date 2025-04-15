@@ -1,16 +1,10 @@
-project(Dialoges)
+project(Pages)
 
 add_library(${PROJECT_NAME}
-    LoginWindow.h 
-    LoginWindow.cpp
-    RegisterWindow.h 
-    RegisterWindow.cpp
-    SellStocksWindow.h
-    SellStocksWindow.cpp
-    BuyStocksWindow.h 
-    BuyStocksWindow.cpp
-    MenuWindow.h
-    MenuWindow.cpp
+    UserStocksPage.h 
+    UserStocksPage.cpp
+    ExchangeGlassPage.h
+    ExchangeGlassPage.cpp
 )
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Network)
@@ -22,4 +16,6 @@ target_link_libraries(${PROJECT_NAME}
         Qt6::Gui   
         Qt6::Core 
         Qt6::Network
+    PUBLIC 
+        Models
 )

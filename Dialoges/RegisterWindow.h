@@ -10,7 +10,7 @@
 #include "../Requests/Request.h"
 
 
-class RegisterWindow : public QDialog {
+class RegisterWindow : public QWidget {
     Q_OBJECT
 
 public:

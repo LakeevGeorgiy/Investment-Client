@@ -9,7 +9,7 @@
 #include "../MainWindow.h"
 
 RegisterWindow::RegisterWindow(std::shared_ptr<Context> context, QWidget *parent):
-    QDialog(parent) 
+    QWidget(parent) 
     , username_input_(new QLineEdit(this))
     , password_input_(new QLineEdit(this))
     , repeat_pass_input_(new QLineEdit(this))
@@ -63,7 +63,7 @@ RegisterWindow::RegisterWindow(std::shared_ptr<Context> context, QWidget *parent
     connect(this, &RegisterWindow::RegisterRequest, request_.get(), &Request::PostRequest);
     connect(request_.get(), &Request::gotHttpData, this, &RegisterWindow::onHttpRead);
     connect(request_.get(), &Request::httpFinished, this, &RegisterWindow::onHttpFinished);
-    connect(this, &RegisterWindow::UserLogin, static_cast<MainWindow*>(parent), &MainWindow::WriteName);
+    connect(this, &RegisterWindow::UserLogin, static_cast<MainWindow*>(parent), &MainWindow::UpdateMainWindow);
 
     network_thread_->start();
     top_layout->addLayout(grid_layout);

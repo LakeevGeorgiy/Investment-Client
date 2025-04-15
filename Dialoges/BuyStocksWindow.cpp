@@ -50,8 +50,8 @@ BuyStocksWindow::BuyStocksWindow(const Stock& stock, std::shared_ptr<Context> co
     connect(buy_button_, &QPushButton::clicked, this, &BuyStocksWindow::BuyButtonClicked);
     connect(this, &BuyStocksWindow::BuyRequest, request_.get(), &Request::PostRequest);
     connect(request_.get(), &Request::gotHttpData, this, &BuyStocksWindow::onHttpRead);
-    connect(this, &BuyStocksWindow::SuccessBuy, static_cast<MainWindow*>(parent), &MainWindow::AllStocksRequest);
-    connect(this, &BuyStocksWindow::UpdateBalance, static_cast<MainWindow*>(parent), &MainWindow::WriteBalance);
+    connect(this, &BuyStocksWindow::SuccessBuy, static_cast<ExchangeGlassPage*>(parent), &ExchangeGlassPage::OpenPage);
+    connect(this, &BuyStocksWindow::UpdateBalance, static_cast<ExchangeGlassPage*>(parent), &ExchangeGlassPage::WriteBalance);
 
     network_thread_->start();
 
