@@ -1,22 +1,55 @@
+#main_window {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #FFFFFF, stop:1 #E6F0F7);
+}
+
+QDialog {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+    stop:0 #FFFFFF, stop:1 #E6F0F7);
+}
+
+QTableWidget {
+    background-color: #FFFFFF;
+    alternate-background-color: #F8FBFF;
+    gridline-color: #E3F2FD;
+}
+
 QPushButton {
-    font-size: 17px;
-    background-color: red;
-    padding: 7px 15px;
-    border: 1px solid;
-    border-radius: 6px;
-    font-weight: bold;
+    background-color: #1976D2;
+    color: white;
+    border-radius: 4px;
+    padding: 6px 12px;
 }
 
 QPushButton::pressed {
-    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                      stop: 0 #ff0000, stop: 1 #ad0000);
+    background: qlineargradient(
+        x1:0, y1:0, x2:1, y2:1,
+        stop:0 #6D8995, 
+        stop:0.5 #546E7A,
+        stop:1 #3D5663
+    );
+}
+
+QLineEdit {
+    color: #546E7A;
+    font-size: 17px;
+    background-color: #FFFFFF;
+}
+
+QTableWidget::item {
+    border: none;
 }
 
 #sell_button {
-    font-size: 0px;
-    background-color: none;
-    border-radius: 0px;
     border: none;
+    padding: 10px 25px;
+}
+#sell_button:hover {
+    opacity: 0.9;
+}
+
+#menu_button {
+    font-size: 25px;
 }
 
 QTableWidget {
@@ -33,12 +66,9 @@ QHeaderView {
 }
 
 QLabel {
+    color: black;
     font-size: 17px;
     padding: 5px 15px;
-}
-
-QLineEdit {
-    font-size: 17px;
 }
 
 
@@ -62,3 +92,19 @@ QLineEdit {
     color: red;
 }
 
+#card_label {
+    font-size: 15px;
+}
+
+#stock_card {
+    background: #FFFFFF;
+    border: 1px solid #E3F2FD;
+    border-radius: 8px;
+}
+#stock_card:hover {
+    border: 1px solid #90CAF9;
+}
+
+#stock_info {
+    color: #546E7A;
+}

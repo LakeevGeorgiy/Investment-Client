@@ -14,6 +14,7 @@ int main(int argc, char **argv) {
     styles_file.close();
 
     MainWindow main_window;
+    main_window.setObjectName("main_window");
     main_window.show();
     return app.exec();
 }

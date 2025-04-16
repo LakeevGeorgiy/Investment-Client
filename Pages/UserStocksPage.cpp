@@ -108,7 +108,8 @@ void UserStocksPage::PrintStocks(QJsonArray& stocks_json, const QString& button_
             stock_object["id"].toInt(),
             stock_object["cost"].toInt(),
             stock_object["count"].toInt(),
-            stock_object["company_name"].toString()
+            stock_object["company_name"].toString(),
+            stock_object["image_url"].toString()
         );
 
         qDebug() << "count: " << stock.count_;

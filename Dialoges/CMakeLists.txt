@@ -9,8 +9,6 @@ add_library(${PROJECT_NAME}
     SellStocksWindow.cpp
     BuyStocksWindow.h 
     BuyStocksWindow.cpp
-    MenuWindow.h
-    MenuWindow.cpp
 )
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Network)

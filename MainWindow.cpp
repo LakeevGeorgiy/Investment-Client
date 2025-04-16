@@ -33,7 +33,9 @@ MainWindow::MainWindow(QWidget *root) :
 {
 
     setWindowTitle(tr("Investments Application"));
-    resize(600,400);
+    resize(1200,800);
+
+    this->setMinimumSize(900, 350);
 
     auto grid_layout = new QVBoxLayout();
     auto menu_layout = new QHBoxLayout();
@@ -42,28 +44,33 @@ MainWindow::MainWindow(QWidget *root) :
     menu_layout->setAlignment(Qt::AlignHCenter);
     
     auto login_button = new QPushButton("Log In");
-    login_button->setObjectName("login_button");
+    login_button->setObjectName("menu_button");
     connect(login_button, &QPushButton::clicked, this, &MainWindow::ClickLogIntButton);
+    menu_layout->addStretch(1);
     menu_layout->addWidget(login_button);
+    menu_layout->addStretch(1);
 
     auto register_button = new QPushButton("Register");
-    register_button->setObjectName("register_button");
+    register_button->setObjectName("menu_button");
     connect(register_button, &QPushButton::clicked, this, &MainWindow::ClickRegistrationButton);
     menu_layout->addWidget(register_button);
+    menu_layout->addStretch(1);
 
     user_stocks_button_->setVisible(false);
-    user_stocks_button_->setObjectName("list_button");
+    user_stocks_button_->setObjectName("menu_button");
     connect(user_stocks_button_, &QPushButton::clicked, this, &MainWindow::ClickUserStocksButton);
 
     auto exchange_button = new QPushButton("Exchange");
-    exchange_button->setObjectName("exchange_button");
+    exchange_button->setObjectName("menu_button");
     connect(exchange_button, &QPushButton::clicked, this, &MainWindow::ClickAllStocksButton);
 
     connect(this, &MainWindow::OpenUserStockPage, user_stocks_page_.get(), &UserStocksPage::OpenPage);
     connect(this, &MainWindow::OpenExchangeGlassPage, exchange_glass_page_.get(), &ExchangeGlassPage::OpenPage);
 
     menu_layout->addWidget(user_stocks_button_);
+    menu_layout->addStretch(1);
     menu_layout->addWidget(exchange_button);
+    menu_layout->addStretch(1);
     
     grid_layout->addLayout(menu_layout);
     top_layout_->addLayout(grid_layout);
