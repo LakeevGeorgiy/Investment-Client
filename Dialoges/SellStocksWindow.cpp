@@ -39,7 +39,7 @@ SellStocksWindow::SellStocksWindow(const Stock& stock, std::shared_ptr<Context> 
 
     top_layout->addLayout(grid_layout);
     sell_problem_->setVisible(false);
-    sell_problem_->setObjectName("sell_problem");
+    sell_problem_->setObjectName("problem");
 
     top_layout->addWidget(sell_problem_);
 

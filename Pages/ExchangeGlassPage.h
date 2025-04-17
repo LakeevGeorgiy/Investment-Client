@@ -33,7 +33,6 @@ public:
 
 signals:
 
-    void SendImageRequest(QNetworkRequest request, QByteArray body);
     void SendAllStocksRequest(QNetworkRequest request, QByteArray body);
 
 public slots:
@@ -44,9 +43,7 @@ public slots:
 
 private:
 
-    void ImageRequest(QString image_string);
     void AllStocksRequest();
-    void ImageRead(QPushButton* button, int status_code, QByteArray data);
     QSize NumberOfRowsAndCols(size_t stocks_number);
     void PrintStocks(
         QJsonArray& stocks_json, const QString& button_text, std::function<void(Stock)>& button_click);

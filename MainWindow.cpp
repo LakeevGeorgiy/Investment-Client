@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *root) :
 {
 
     setWindowTitle(tr("Investments Application"));
-    resize(1200,800);
+    resize(920,800);
 
     this->setMinimumSize(900, 350);
 
@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *root) :
     menu_layout->addWidget(register_button);
     menu_layout->addStretch(1);
 
-    user_stocks_button_->setVisible(false);
+    // user_stocks_button_->setVisible(false);
     user_stocks_button_->setObjectName("menu_button");
     connect(user_stocks_button_, &QPushButton::clicked, this, &MainWindow::ClickUserStocksButton);
 

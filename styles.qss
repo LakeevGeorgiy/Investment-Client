@@ -9,9 +9,10 @@ QDialog {
 }
 
 QTableWidget {
-    background-color: #FFFFFF;
+    background-color: #E6F0F7;
     alternate-background-color: #F8FBFF;
     gridline-color: #E3F2FD;
+    selection-background-color: transparent;
 }
 
 QPushButton {
@@ -49,11 +50,8 @@ QTableWidget::item {
 }
 
 #menu_button {
+    width: 120px;
     font-size: 25px;
-}
-
-QTableWidget {
-    font-size: 17px;
 }
 
 QHeaderView {
@@ -72,24 +70,9 @@ QLabel {
 }
 
 
-#authorization_problem {
-    font-size:15px;
+#problem {
     color: red;
-}
-
-#buy_problem {
-    font-size:15px;
-    color: red;
-}
-
-#sell_problem {
-    font-size:15px;
-    color: red;
-}
-
-#authorization_problem {
-    font-size:15px;
-    color: red;
+    font-size: 15px;
 }
 
 #card_label {
@@ -103,6 +86,7 @@ QLabel {
 }
 #stock_card:hover {
     border: 1px solid #90CAF9;
+    background: #E3F2FD;
 }
 
 #stock_info {

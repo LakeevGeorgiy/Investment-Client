@@ -53,7 +53,7 @@ RegisterWindow::RegisterWindow(std::shared_ptr<Context> context, QWidget *parent
     grid_layout->addWidget(repeat_pass_input_, 2, 1);
 
     authorization_problem_->setVisible(false);
-    authorization_problem_->setObjectName("authorization_problem");
+    authorization_problem_->setObjectName("problem");
 
     button_layout->addWidget(register_button_);
 

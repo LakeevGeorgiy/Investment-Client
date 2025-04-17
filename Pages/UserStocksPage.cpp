@@ -5,6 +5,7 @@
 #include <QJsonArray>
 #include <QMessageBox>
 #include <QHeaderView>
+#include <QTableWidgetItem>
 
 #include "UserStocksPage.h"
 #include "../Dialoges/SellStocksWindow.h"
@@ -19,15 +20,15 @@ UserStocksPage::UserStocksPage(std::shared_ptr<Context> context, QWidget *root):
 {
     auto top_layout = new QVBoxLayout(this);
     auto balance_layout = new QHBoxLayout();
+    balance_layout->setAlignment(Qt::AlignHCenter);
+    
+    balance_->setObjectName("balance");
     balance_->setText("Your current balance: " + QString::number(context_->user_.balance_));
     balance_layout->addWidget(balance_);
     top_layout->addLayout(balance_layout);
 
-    auto grid_layout = new QHBoxLayout();
-    grid_layout->addWidget(stocks_grid_);
-    grid_layout->setAlignment(Qt::AlignHCenter);
-    stocks_grid_->resizeRowsToContents();
-    top_layout->addLayout(grid_layout);
+    stocks_grid_->setShowGrid(false);
+    top_layout->addWidget(stocks_grid_);
 
     user_stocks_request_->moveToThread(network_thread_);
     connect(this, &UserStocksPage::SendUserStockRequest, user_stocks_request_.get(), &Request::GetRequest);
@@ -41,10 +42,28 @@ UserStocksPage::~UserStocksPage(){
 }
 
 void UserStocksPage::WriteBalance(){
+    balance_->setStyleSheet(
+        "QLabel {"
+        "   font-size: 17px;"
+        "   color: black;"
+        "}"
+    );
     balance_->setText("Your current balance: " + QString::number(context_->user_.balance_));
 }
 
 void UserStocksPage::OpenPage() {
+    if (!context_->authorized_) {
+        balance_->setObjectName("balance");
+        balance_->setStyleSheet(
+            "QLabel {"
+            "   font-size: 17px;"
+            "   color: red;"
+            "}"
+        );
+        balance_->setText("You must be authorized");
+        stocks_grid_->setVisible(false);
+        return;
+    }
     WriteBalance();
     UserStocksRequest();
 }
@@ -94,17 +113,15 @@ void UserStocksPage::UserStocksRead(int status_code, QByteArray data) {
 
 void UserStocksPage::PrintStocks(QJsonArray& stocks_json, const QString& button_text, std::function<void(Stock)>& button_click){
 
-    stocks_grid_->clear();
-    stocks_grid_->setRowCount(stocks_json.size());
-    stocks_grid_->setHorizontalHeaderLabels({"Cost", "Count", "Company", ""});
-    stocks_grid_->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    stocks_grid_->verticalHeader()->setVisible(false);
+    size_t cur_col = 0;
+    size_t cur_row = 0;
+    std::vector<Stock> stocks;
 
-    for (int i = 0; i < stocks_json.size(); ++i) {
+    for (size_t i = 0; i < stocks_json.size(); ++i) {
 
         auto stock_object = QJsonValue(stocks_json[i]);
-
-        Stock stock(
+        
+        auto stock = Stock(
             stock_object["id"].toInt(),
             stock_object["cost"].toInt(),
             stock_object["count"].toInt(),
@@ -112,27 +129,65 @@ void UserStocksPage::PrintStocks(QJsonArray& stocks_json, const QString& button_
             stock_object["image_url"].toString()
         );
 
-        qDebug() << "count: " << stock.count_;
-        
         if (stock.count_ == 0) {
             continue;
         }
 
-        auto cost = new QTableWidgetItem(QString::number(stock.cost_));
-        cost->setTextAlignment(Qt::AlignHCenter);
-        auto count = new QTableWidgetItem(QString::number(stock.count_));
-        count->setTextAlignment(Qt::AlignHCenter);
-        auto cell_button = new QPushButton(button_text);
-        auto company = new QTableWidgetItem(stock.company_name_);
-        company->setTextAlignment(Qt::AlignHCenter); 
-        connect(cell_button, &QPushButton::clicked, std::bind(button_click, stock));
-    
-    
-        stocks_grid_->setItem(i, 0, cost);
-        stocks_grid_->setItem(i, 1, count);
-        stocks_grid_->setItem(i, 2, company);
-        stocks_grid_->setCellWidget(i, 3, cell_button);
+        stocks.emplace_back(stock);
     }
+    
+    const QSize card_size(220, 240);
+    const QSize rows_cols_number(stocks.size() / 4 + 1, 4);
+
     stocks_grid_->setVisible(true);
+    stocks_grid_->clear();
+    stocks_grid_->setColumnCount(rows_cols_number.height());
+    stocks_grid_->setRowCount(rows_cols_number.width());
+    stocks_grid_->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    stocks_grid_->horizontalHeader()->setDefaultAlignment(Qt::AlignCenter);
+    stocks_grid_->verticalHeader()->setVisible(false);
+    stocks_grid_->horizontalHeader()->setVisible(false);
+
+    stocks_grid_->verticalHeader()->setDefaultSectionSize(card_size.width());
+    stocks_grid_->horizontalHeader()->setDefaultSectionSize(card_size.height());
+    
+    for (auto& stock : stocks) {
+
+        auto card = new QFrame();
+        card->setObjectName("stock_card");
+        card->setFixedSize(card_size);
+
+        auto stock_layout = new QVBoxLayout(card);
+        stock_layout->setAlignment(Qt::AlignVCenter);
+
+        auto infoLayout = new QVBoxLayout();
+        infoLayout->setSpacing(4);
+
+        auto costLabel = new QLabel(QString("Cost: %1").arg(stock.cost_));
+        costLabel->setObjectName("stock_info");
+        
+        auto countLabel = new QLabel(QString("Available: %1").arg(stock.count_));
+        countLabel->setObjectName("stock_info");
+
+        infoLayout->addWidget(costLabel);
+        infoLayout->addWidget(countLabel);
+        stock_layout->addLayout(infoLayout);
+        
+        auto cell_button = new QPushButton(stock.company_name_);
+        cell_button->setObjectName("sell_button");
+        connect(cell_button, &QPushButton::clicked, std::bind(button_click, stock));
+        stock_layout->addWidget(cell_button);
+        
+        stocks_grid_->setCellWidget(cur_row, cur_col, card);
+        stocks_grid_->setRowHeight(cur_row, 240);
+        stocks_grid_->setColumnWidth(cur_col, 220);
+
+        qDebug() << "row: " << cur_row << " col: " << cur_col;
+
+        ++cur_col;
+        cur_row += cur_col / rows_cols_number.height();
+        cur_col %= rows_cols_number.height();
+
+    }
 
 }

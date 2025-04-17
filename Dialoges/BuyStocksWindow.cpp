@@ -39,7 +39,7 @@ BuyStocksWindow::BuyStocksWindow(const Stock& stock, std::shared_ptr<Context> co
 
     top_layout->addLayout(grid_layout);
     buy_problem_->setVisible(false);
-    buy_problem_->setObjectName("buy_problem");
+    buy_problem_->setObjectName("problem");
     top_layout->addWidget(buy_problem_);
 
     button_layout->addWidget(buy_button_);

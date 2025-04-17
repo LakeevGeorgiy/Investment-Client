@@ -47,7 +47,7 @@ LoginWindow::LoginWindow( std::shared_ptr<Context> context, QWidget *parent):
 
     auto problem_layout = new QHBoxLayout();
     authorization_problem_->setVisible(false);
-    authorization_problem_->setObjectName("authorization_problem");
+    authorization_problem_->setObjectName("problem");
     problem_layout->addWidget(authorization_problem_);
     problem_layout->setAlignment(Qt::AlignHCenter);
     top_layout->addLayout(problem_layout);

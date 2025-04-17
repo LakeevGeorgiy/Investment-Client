@@ -40,10 +40,6 @@ ExchangeGlassPage::ExchangeGlassPage(std::shared_ptr<Context> context, QWidget *
     connect(this, &ExchangeGlassPage::SendAllStocksRequest, all_stocks_request_.get(), &Request::GetRequest);
     connect(all_stocks_request_.get(), &Request::gotHttpData, this, &ExchangeGlassPage::AllStocksRead);
 
-    connect(this, &ExchangeGlassPage::SendImageRequest, image_request_.get(), &Request::GetRequest);
-    // connect(image_request_.get(), &Request::gotHttpData, this, &ExchangeGlassPage)
-
-    connect(this->windowHandle(), &QWindow::widthChanged, this, &ExchangeGlassPage::AllStocksRequest);
     network_thread_->start();
 }
 
@@ -61,15 +57,6 @@ void ExchangeGlassPage::OpenPage() {
     AllStocksRequest();
 }
 
-void ExchangeGlassPage::ImageRequest(QString url_string) {
-    const QUrl url = QUrl::fromUserInput(url_string);
-
-    QNetworkRequest request(url);
-    QByteArray body;
-
-    emit SendImageRequest(request, body);
-}
-
 void ExchangeGlassPage::AllStocksRequest(){
 
     const QString url_string("http://localhost:8080/api/list_all_stocks");
@@ -79,44 +66,6 @@ void ExchangeGlassPage::AllStocksRequest(){
     QByteArray body;
 
     emit SendAllStocksRequest(request, body);
-}
-
-void ExchangeGlassPage::ImageRead(QPushButton* button, int status_code, QByteArray data){
-    if (status_code != 200) {
-        return;
-    }
-
-    QBuffer buffer(&const_cast<QByteArray&>(data));
-    buffer.open(QIODevice::ReadOnly);
-    
-    QImageReader reader(&buffer, "JPG");
-    if (!reader.canRead()) {
-        qWarning() << "Cannot read JPG data:" << reader.errorString();
-        return;
-    }
-    
-    QImage image = reader.read();
-    if (image.isNull()) {
-        qWarning() << "Failed to read JPG image:" << reader.errorString();
-        return;
-    }
-    
-    QPixmap pixmap = QPixmap::fromImage(image);
-
-    QSize icon_size(200, 200);
-    QIcon icon("../resources/ozon.jpg");
-
-    if (pixmap.loadFromData(data, "JPG")) {
-        icon = QIcon(pixmap);
-        button->setIcon(icon);
-        return;
-    }
-    qDebug() << "image read\n";
-
-    button->setIcon(icon);
-    button->setIconSize(icon_size);
-    button->setFlat(true);
-
 }
 
 void ExchangeGlassPage::AllStocksRead(int status_code, QByteArray data) {
@@ -176,28 +125,31 @@ void ExchangeGlassPage::PrintStocks(QJsonArray& stocks_json, const QString& butt
         stocks.emplace_back(stock);
     }
     
-    QSize table_size = NumberOfRowsAndCols(stocks.size());
-    qDebug() << "table size: " << table_size;   
+    const QSize card_size(220, 240);
+    const QSize rows_cols_number(stocks.size() / 4 + 1, 4);
 
     stocks_grid_->clear();
-    stocks_grid_->setColumnCount(table_size.height());
-    stocks_grid_->setRowCount(table_size.width());
-    stocks_grid_->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    stocks_grid_->setColumnCount(rows_cols_number.height());
+    stocks_grid_->setRowCount(rows_cols_number.width());
+    // stocks_grid_->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    for (int col = 0; col + 1< rows_cols_number.height(); ++col) {
+        stocks_grid_->horizontalHeader()->setSectionResizeMode(col, QHeaderView::Stretch);
+        // stocks_grid_->horizontalHeader()->setStretchLastSection(false);
+    }
+    stocks_grid_->horizontalHeader()->setStretchLastSection(false); 
+    stocks_grid_->horizontalHeader()->setDefaultAlignment(Qt::AlignCenter);
     stocks_grid_->verticalHeader()->setVisible(false);
     stocks_grid_->horizontalHeader()->setVisible(false);
 
-    stocks_grid_->verticalHeader()->setDefaultSectionSize(240);
-    // stocks_grid_->verticalHeader()->setSectionResizeMode(QHeaderView::);
-
-    stocks_grid_->horizontalHeader()->setDefaultSectionSize(220);
-    // stocks_grid_->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-
+    stocks_grid_->verticalHeader()->setDefaultSectionSize(card_size.width());
+    stocks_grid_->horizontalHeader()->setDefaultSectionSize(card_size.height());
     
     for (auto& stock : stocks) {
 
         auto card = new QFrame();
         card->setObjectName("stock_card");
-        card->setFixedSize(QSize(220, 240));
+        card->setFixedSize(card_size);
 
         auto stock_layout = new QVBoxLayout(card);
         stock_layout->setAlignment(Qt::AlignVCenter);
@@ -227,13 +179,11 @@ void ExchangeGlassPage::PrintStocks(QJsonArray& stocks_json, const QString& butt
         qDebug() << "row: " << cur_row << " col: " << cur_col;
 
         ++cur_col;
-        cur_row += cur_col / table_size.height();
-        cur_col %= table_size.height();
+        cur_row += cur_col / rows_cols_number.height();
+        cur_col %= rows_cols_number.height();
 
+        if (cur_col > 0) {
+        }
     }
 
-    top_layout_->addWidget(stocks_grid_);
-
 }
-
-
